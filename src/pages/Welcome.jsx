@@ -11,7 +11,7 @@ function StringDivider({ className = '' }) {
     <div className={`w-full ${className}`} aria-hidden="true">
       <svg
         viewBox="0 0 1200 28"
-        className="w-full h-7"
+        className="h-5 w-full sm:h-7"
         preserveAspectRatio="none"
       >
         {gauges.map((g, i) => (
@@ -34,14 +34,16 @@ function StringDivider({ className = '' }) {
 /** Feature card with a small inline icon. */
 function FeatureCard({ icon, title, children }) {
   return (
-    <div className="card bg-base-100 border border-base-300 transition-transform duration-200 motion-safe:hover:-translate-y-1 hover:border-secondary">
-      <div className="card-body gap-3">
-        <span className="grid size-11 place-items-center rounded-field bg-secondary/20 text-primary">
+    <div className="card border border-base-300 bg-base-100 transition-transform duration-200 hover:border-secondary motion-safe:hover:-translate-y-1">
+      <div className="card-body gap-3 p-5 sm:p-6">
+        <span className="grid size-10 place-items-center rounded-field bg-secondary/20 text-primary sm:size-11">
           {icon}
         </span>
-        <h3 className="card-title text-lg leading-snug">{title}</h3>
+        <h3 className="card-title text-base leading-snug sm:text-lg">
+          {title}
+        </h3>
         {children ? (
-          <p className="text-base-content/70 text-sm">{children}</p>
+          <p className="text-sm text-base-content/70">{children}</p>
         ) : null}
       </div>
     </div>
@@ -59,7 +61,7 @@ const iconProps = {
   strokeWidth: 1.6,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
-  className: 'size-6',
+  className: 'size-5 sm:size-6',
 };
 
 const IconSearch = (
@@ -91,6 +93,55 @@ const IconTrack = (
 );
 
 /* ------------------------------------------------------------------ */
+/* Data                                                                */
+/* ------------------------------------------------------------------ */
+
+const LESSONS = [
+  {
+    id: 'IzxMeQgtyYE',
+    channel: 'Marty Music',
+    note: 'Acoustic, start to finish',
+    len: '15:09',
+  },
+  {
+    id: 'o2NaGFteNvY',
+    channel: 'GuitarZero2Hero Express',
+    note: 'Follow the tab',
+    len: '05:48',
+  },
+  {
+    id: 'yDY6y8llnA0',
+    channel: 'JustinGuitar Songs',
+    note: 'Simplified chords and rhythm',
+    len: '16:27',
+  },
+  {
+    id: 'EPVef6YlOLw',
+    channel: 'GuitarZero2Hero',
+    note: 'The complete arrangement',
+    len: '34:32',
+  },
+];
+
+const STEPS = [
+  {
+    step: '01',
+    title: 'Find the song',
+    body: 'Search by title or artist and open its lesson page.',
+  },
+  {
+    step: '02',
+    title: 'Pick your teacher',
+    body: 'Compare a few videos and stay with whoever explains it your way.',
+  },
+  {
+    step: '03',
+    title: 'Play it through',
+    body: 'Run it with the backing track until it sounds like the record.',
+  },
+];
+
+/* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -98,32 +149,30 @@ export default function Welcome() {
   return (
     <>
       {/* ============================= HERO ============================= */}
-      <section className="relative overflow-hidden">
-        {/* warm ambient wash */}
+      <section className="relative w-full max-w-full overflow-x-hidden">
+        {/* Warm ambient wash. Two blurred fields rather than a gradient string:
+            Tailwind v4 resolves daisyUI colours as CSS vars, so theme() inside
+            an arbitrary value silently produces nothing. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,theme(colors.secondary/25),transparent_60%),radial-gradient(ellipse_at_bottom_left,theme(colors.accent/12),transparent_55%)]"
-        />
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          <div className="absolute -top-32 -right-24 size-80 rounded-full bg-secondary/25 blur-3xl sm:size-[28rem]" />
+          <div className="absolute -bottom-32 -left-24 size-72 rounded-full bg-accent/15 blur-3xl sm:size-96" />
+        </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-16 lg:py-24">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+          <div className="grid items-center gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             {/* ---- copy ---- */}
-            <div>
-              {/* <span className="badge badge-outline border-highlight text-highlight gap-2 py-3">
-                <span className="size-1.5 rounded-full bg-highlight" />
-                Free to start · No guitar experience needed
-              </span> */}
-
-              <h1 className="mt-6 font-serif text-5xl leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-                Learn the songs
-                <br />
-                you actually
-                <span className="relative ml-3 inline-block text-primary">
+            <div className="min-w-0">
+              <h1 className="font-serif text-4xl leading-[1.1] tracking-tight text-balance sm:text-6xl lg:text-7xl">
+                Learn the songs you actually{' '}
+                <span className="relative inline-block text-primary">
                   want to play
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 300 12"
-                    className="absolute -bottom-2 left-0 w-full text-highlight"
+                    className="absolute -bottom-1 left-0 w-full text-highlight sm:-bottom-2"
                     preserveAspectRatio="none"
                   >
                     <path
@@ -137,23 +186,23 @@ export default function Welcome() {
                 </span>
               </h1>
 
-              <p className="mt-8 max-w-lg text-lg text-base-content/75">
+              <p className="mt-6 max-w-lg text-base text-pretty text-base-content/75 sm:mt-8 sm:text-lg">
                 Every song comes with a handful of video lessons from different
                 teachers. Pick the one that clicks, play along with the backing
                 track, and enjoy the song by the end of the week.
               </p>
 
-              {/* ---- primary actions (placeholder links) ---- */}
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              {/* ---- primary actions ---- */}
+              <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:gap-4">
                 <Link
                   to="/signup"
-                  className="btn btn-primary btn-lg px-10 text-base shadow-md"
+                  className="btn btn-primary btn-lg w-full text-base shadow-md sm:w-auto sm:px-10"
                 >
                   Start learning free
                 </Link>
                 <Link
                   to="/login"
-                  className="btn btn-accent btn-lg px-10 text-base"
+                  className="btn btn-accent btn-lg w-full text-base sm:w-auto sm:px-10"
                 >
                   Log in
                 </Link>
@@ -165,60 +214,35 @@ export default function Welcome() {
             </div>
 
             {/* ---- signature: one song, several teachers ---- */}
-            <div className="relative mx-auto w-full max-w-md">
+            <div className="relative mx-auto w-full min-w-0 max-w-md">
               <div
                 aria-hidden="true"
-                className="absolute -inset-6 rounded-box bg-secondary/15 blur-2xl"
+                className="absolute -inset-4 rounded-box bg-secondary/15 blur-2xl sm:-inset-6"
               />
 
               {/* fanned-out lesson cards */}
               <div className="relative">
-                <div className="absolute inset-x-6 -top-6 h-24 rounded-box border border-base-300 bg-base-200 rotate-[-4deg]" />
-                <div className="absolute inset-x-3 -top-3 h-24 rounded-box border border-base-300 bg-base-200 rotate-[2deg]" />
+                <div className="absolute inset-x-4 -top-4 h-24 rotate-[-4deg] rounded-box border border-base-300 bg-base-200 sm:inset-x-6 sm:-top-6" />
+                <div className="absolute inset-x-2 -top-2 h-24 rotate-[2deg] rounded-box border border-base-300 bg-base-200 sm:inset-x-3 sm:-top-3" />
 
-                <div className="relative rounded-box border border-base-300 bg-base-100 p-6 shadow-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-neutral">
+                <div className="relative rounded-box border border-base-300 bg-base-100 p-4 shadow-lg sm:p-6">
+                  <p className="text-xs tracking-[0.18em] text-neutral uppercase">
                     Now learning
                   </p>
-                  <h2 className="mt-1 font-serif text-2xl">
+                  <h2 className="mt-1 font-serif text-xl sm:text-2xl">
                     Wish You Were Here
                   </h2>
                   <p className="text-sm text-base-content/60">
                     Pink Floyd · Beginner · 4 lessons
                   </p>
 
-                  <ul className="mt-6 space-y-3">
-                    {[
-                      {
-                        id: 'IzxMeQgtyYE',
-                        channel: 'Marty Music',
-                        note: 'Acoustic, start to finish',
-                        len: '15:09',
-                      },
-                      {
-                        id: 'o2NaGFteNvY',
-                        channel: 'GuitarZero2Hero Express',
-                        note: 'Follow the tab',
-                        len: '05:48',
-                      },
-                      {
-                        id: 'yDY6y8llnA0',
-                        channel: 'JustinGuitar Songs',
-                        note: 'Simplified chords and rhythm',
-                        len: '16:27',
-                      },
-                      {
-                        id: 'EPVef6YlOLw',
-                        channel: 'GuitarZero2Hero',
-                        note: 'The complete arrangement',
-                        len: '34:32',
-                      },
-                    ].map((lesson) => (
+                  <ul className="mt-5 space-y-2.5 sm:mt-6 sm:space-y-3">
+                    {LESSONS.map((lesson) => (
                       <li
                         key={lesson.id}
                         className="flex items-center gap-3 rounded-field border border-base-300 bg-base-200 p-2"
                       >
-                        <span className="relative block w-24 shrink-0 overflow-hidden rounded-[calc(var(--radius-field)-2px)]">
+                        <span className="relative block w-20 shrink-0 overflow-hidden rounded-[calc(var(--radius-field)-2px)] sm:w-24">
                           <img
                             src={`https://img.youtube.com/vi/${lesson.id}/mqdefault.jpg`}
                             alt=""
@@ -228,10 +252,10 @@ export default function Welcome() {
                             className="aspect-video w-full object-cover"
                           />
                           <span className="absolute inset-0 grid place-items-center bg-primary/35">
-                            <span className="grid size-7 place-items-center rounded-full bg-base-100/90 text-primary">
+                            <span className="grid size-6 place-items-center rounded-full bg-base-100/90 text-primary sm:size-7">
                               <svg
                                 viewBox="0 0 24 24"
-                                className="size-3.5"
+                                className="size-3 sm:size-3.5"
                                 fill="currentColor"
                               >
                                 <path d="M8 5.5v13l11-6.5z" />
@@ -249,14 +273,14 @@ export default function Welcome() {
                           </span>
                         </span>
 
-                        <span className="pr-2 text-xs tabular-nums text-neutral">
+                        <span className="shrink-0 pr-1 text-xs tabular-nums text-neutral sm:pr-2">
                           {lesson.len}
                         </span>
                       </li>
                     ))}
                   </ul>
 
-                  <p className="mt-5 text-center text-xs text-base-content/55">
+                  <p className="mt-4 text-center text-xs text-base-content/55 sm:mt-5">
                     One song. Four teachers. Your pick.
                   </p>
                 </div>
@@ -269,18 +293,21 @@ export default function Welcome() {
       </section>
 
       {/* =========================== FEATURES =========================== */}
-      <section id="features" className="bg-base-200 px-6 py-20 lg:py-24">
+      <section
+        id="features"
+        className="bg-base-200 px-5 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-accent">
+            <p className="text-xs tracking-[0.2em] text-accent uppercase">
               What you get
             </p>
-            <h2 className="mt-3 font-serif text-4xl sm:text-5xl">
+            <h2 className="mt-3 font-serif text-3xl text-balance sm:text-4xl lg:text-5xl">
               Everything the song needs, in one place
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
             <FeatureCard icon={IconSearch} title="Learn any song">
               Search the song, get the lessons. No hunting through playlists.
             </FeatureCard>
@@ -307,15 +334,15 @@ export default function Welcome() {
           </div>
 
           {/* ---- the fifth one, given its own weight ---- */}
-          <div className="mt-8 flex flex-col items-center gap-4 rounded-box border border-highlight/40 bg-highlight/10 px-8 py-7 text-center sm:flex-row sm:text-left">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-highlight text-highlight-content">
+          <div className="mt-4 flex flex-col items-center gap-4 rounded-box border border-highlight/40 bg-highlight/10 px-5 py-6 text-center sm:mt-8 sm:flex-row sm:px-8 sm:py-7 sm:text-left">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-highlight text-highlight-content sm:size-12">
               <svg {...iconProps} className="size-6">
                 <path d="M5 12.5l4.5 4.5L19 7.5" />
               </svg>
             </span>
             <div>
-              <h3 className="font-serif text-2xl">Easy to use</h3>
-              <p className="text-base-content/70">
+              <h3 className="font-serif text-xl sm:text-2xl">Easy to use</h3>
+              <p className="text-sm text-base-content/70 sm:text-base">
                 Open a song, press play, start playing. That is the whole thing.
               </p>
             </div>
@@ -324,38 +351,25 @@ export default function Welcome() {
       </section>
 
       {/* ========================== HOW IT WORKS ======================== */}
-      {/* Suggested addition — a real sequence, so the numbering earns its place. */}
-      <section className="px-6 py-20 lg:py-24">
+      <section className="px-5 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div className="mx-auto max-w-5xl">
-          <h2 className="font-serif text-4xl sm:text-5xl">
+          <h2 className="font-serif text-3xl text-balance sm:text-4xl lg:text-5xl">
             From song to played
           </h2>
 
-          <ol className="mt-12 grid gap-10 sm:grid-cols-3">
-            {[
-              {
-                step: '01',
-                title: 'Find the song',
-                body: 'Search by title or artist and open its lesson page.',
-              },
-              {
-                step: '02',
-                title: 'Pick your teacher',
-                body: 'Compare a few videos and stay with whoever explains it your way.',
-              },
-              {
-                step: '03',
-                title: 'Play it through',
-                body: 'Run it with the backing track until it sounds like the record.',
-              },
-            ].map((item) => (
+          <ol className="mt-8 grid gap-8 sm:mt-12 sm:grid-cols-3 sm:gap-10">
+            {STEPS.map((item) => (
               <li key={item.step}>
-                <span className="font-serif text-3xl text-secondary">
+                <span className="font-serif text-2xl text-secondary sm:text-3xl">
                   {item.step}
                 </span>
-                <div className="mt-3 h-px w-12 bg-base-300" />
-                <h3 className="mt-4 text-xl font-medium">{item.title}</h3>
-                <p className="mt-2 text-base-content/70">{item.body}</p>
+                <div className="mt-2 h-px w-12 bg-base-300 sm:mt-3" />
+                <h3 className="mt-3 text-lg font-medium sm:mt-4 sm:text-xl">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm text-base-content/70 sm:text-base">
+                  {item.body}
+                </p>
               </li>
             ))}
           </ol>
@@ -363,20 +377,25 @@ export default function Welcome() {
       </section>
 
       {/* ============================ CTA BAND ========================== */}
-      {/* Suggested addition — repeats the hero action for anyone who scrolled. */}
-      <section className="bg-primary px-6 py-20 text-primary-content">
-        <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
-          <h2 className="font-serif text-4xl sm:text-5xl">
+      <section className="bg-primary px-5 py-14 text-primary-content sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 text-center sm:gap-8">
+          <h2 className="font-serif text-3xl text-balance sm:text-4xl lg:text-5xl">
             Pick a song. Play it by the weekend.
           </h2>
-          <p className="max-w-xl text-primary-content/80">
+          <p className="max-w-xl text-pretty text-primary-content/80">
             Create an account and your first lesson is one click away.
           </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Link to="/signup" className="btn btn-secondary btn-lg px-10">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4">
+            <Link
+              to="/signup"
+              className="btn btn-secondary btn-lg w-full sm:w-auto sm:px-10"
+            >
               Create free account
             </Link>
-            <Link to="/login" className="btn btn-accent btn-lg px-10">
+            <Link
+              to="/login"
+              className="btn btn-accent btn-lg w-full sm:w-auto sm:px-10"
+            >
               Log in
             </Link>
           </div>
