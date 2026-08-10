@@ -1,5 +1,13 @@
 import React, { useState } from "react";
 
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_API_BASE_URL?: string;
+    };
+  }
+}
+
 interface LoginProps {
   onSwitchToRegister: () => void;
   onLoginSuccess: () => void;
@@ -13,7 +21,8 @@ export default function Login({ onSwitchToRegister, onLoginSuccess }: LoginProps
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signin", {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "";
+      const res = await fetch(`${apiBaseUrl}/api/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

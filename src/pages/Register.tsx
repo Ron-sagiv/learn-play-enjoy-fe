@@ -14,11 +14,11 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signin`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password }),
+});
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
       
