@@ -1,3 +1,9 @@
+/* Fonts are self-hosted and loaded in src/main.jsx, above this file's import:
+     import '@fontsource-variable/fraunces/opsz.css';
+     import '@fontsource-variable/karla';
+     import './index.css';
+   Nothing font-related needs to be fetched here. */
+
 @import 'tailwindcss';
 @plugin "daisyui" {
   themes: false; /* drop built-in light/dark, keep only yours */
@@ -52,8 +58,29 @@
   --noise: 0;
 }
 
-/* Terracotta highlight — not a daisyUI slot, so expose it as a utility color */
 @theme {
+  /* Terracotta highlight — not a daisyUI slot, so expose it as a utility color */
   --color-highlight: #c76d4e;
   --color-highlight-content: #f8f4ec;
+
+  /* Typography
+     font-serif  -> Fraunces, the display face (headings only)
+     font-sans   -> Karla, the body face; also the page default via --default-font-family */
+  --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-sans:
+    'Karla', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  html {
+    /* Fraunces is variable on the optical-size axis: let the browser pick the
+       right cut for each size instead of scaling one design up. */
+    font-optical-sizing: auto;
+  }
+
+  /* Fraunces runs wide and loose at display sizes, so pull the tracking in.
+     Applied to the class, not to h1/h2, so it never fights utility classes. */
+  .font-serif {
+    letter-spacing: -0.02em;
+  }
 }
