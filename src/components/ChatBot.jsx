@@ -1,43 +1,46 @@
-import ChatBot from "react-chatbotify";
+import ChatBot from 'react-chatbotify';
 
 const MyChatBot = () => {
-
-	const flow = {
-		start: {
-            message: "Hello! Ask your agent anything.",
-            path: "process_query"
+  const flow = {
+    start: {
+      message: 'Hello! Ask your agent anything.',
+      path: 'process_query',
     },
     process_query: {
-            message: async (params) => {
-                const userPrompt = params.userInput;
-                let fullResponseText = "";
+      message: async (params) => {
+        const userPrompt = params.userInput;
+        let fullResponseText = '';
 
-                try {
-                    // Send request to the Node.js agent stream endpoint
-                    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/agent-stream`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: userPrompt })
-                    });
+        try {
+          // Send request to the Node.js agent stream endpoint
+          const response = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/agent-stream`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: userPrompt }),
+            },
+          );
 
-                    if (!response.body) throw new Error("No response body data available");
-                    //console.log(response.body);
-                    // Read incoming stream chunks
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8"); // Handles multi-byte splits
+          if (!response.body)
+            throw new Error('No response body data available');
+          //console.log(response.body);
+          // Read incoming stream chunks
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8'); // Handles multi-byte splits
 
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
                         // Decode chunk byte array to text string
                         const rawChunk = decoder.decode(value, { stream: true });
                         const lines = rawChunk.split('\n');
                         
                         for (const line of lines) {
-                            console.log(line);
+                            //console.log(line);
                             //if (line.startsWith('data:')) {
-                                console.log(line);
+                                //console.log(line);
                                 try {
                                     //console.log(line.slice(5));
                                     //const parsed = line.slice(6)
@@ -73,10 +76,10 @@ const MyChatBot = () => {
   const settings = {
     isOpen: false,
     general: {
-      primaryColor: '#42b0c5',
-      secondaryColor: '#491d8d',
+      primaryColor: '#6b4f3a',
+      secondaryColor: '#c89b5a',
       fontFamily: 'Arial, sans-serif',
-      embedded: false
+      embedded: false,
     },
     audio: {
       disabled: false,
@@ -85,11 +88,11 @@ const MyChatBot = () => {
         disabled: true
     },
     header: {
-        title: "Music Chat",
-        showAvatar: false
+      title: 'Music Chat',
+      showAvatar: false,
     },
     footer: {
-        text: "2026.Music"
+      text: '2026.Music',
     },
     fileAttachment: {
         disabled: false,
@@ -100,24 +103,21 @@ const MyChatBot = () => {
     autoJumpToBottom: true
     }
     // other sections
-  }; 
- 
+  };
+
   const wrapStyles = {
-    wordBreak: "break-word",      // Breaks words at arbitrary points if needed
-    whiteSpace: "pre-wrap",       // Preserves line breaks and wraps text naturally
-    overflowWrap: "anywhere",     // Ensures unbroken strings wrap safely
-    maxWidth: "100%",             // Keeps the bubble constrained to its container
+    wordBreak: 'break-word', // Breaks words at arbitrary points if needed
+    whiteSpace: 'pre-wrap', // Preserves line breaks and wraps text naturally
+    overflowWrap: 'anywhere', // Ensures unbroken strings wrap safely
+    maxWidth: '100%', // Keeps the bubble constrained to its container
   };
 
-const myStyles = {
+  const myStyles = {
     botBubbleStyle: { ...wrapStyles },
-    userBubbleStyle: { ...wrapStyles }
+    userBubbleStyle: { ...wrapStyles },
   };
 
-
-  return (
-    <ChatBot  settings={settings} flow={flow} styles={myStyles} />
-  );
+  return <ChatBot settings={settings} flow={flow} styles={myStyles} />;
 };
 
 export default MyChatBot;

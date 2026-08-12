@@ -1,1 +1,86 @@
+/* Fonts are self-hosted and loaded in src/main.jsx, above this file's import:
+     import '@fontsource-variable/fraunces/opsz.css';
+     import '@fontsource-variable/karla';
+     import './index.css';
+   Nothing font-related needs to be fetched here. */
+
 @import 'tailwindcss';
+@plugin "daisyui" {
+  themes: false; /* drop built-in light/dark, keep only yours */
+}
+
+@plugin "daisyui/theme" {
+  name: 'learnplay';
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Base — backgrounds & text */
+  --color-base-100: #f8f4ec; /* Warm Cream — page background */
+  --color-base-200: #efe6d8; /* Natural Linen — cards */
+  --color-base-300: #e1d4c0; /* borders, hover, dividers */
+  --color-base-content: #2e241e; /* Dark Cocoa — text */
+
+  /* Brand */
+  --color-primary: #6b4f3a; /* Walnut */
+  --color-primary-content: #f8f4ec;
+  --color-secondary: #c89b5a; /* Honey */
+  --color-secondary-content: #2e241e;
+  --color-accent: #557a46; /* Forest Green */
+  --color-accent-content: #f8f4ec;
+
+  /* Neutral — muted text, subtle surfaces */
+  --color-neutral: #7a736a; /* Stone Gray */
+  --color-neutral-content: #f8f4ec;
+
+  /* Status */
+  --color-info: #4a6e8a;
+  --color-info-content: #f8f4ec;
+  --color-success: #557a46;
+  --color-success-content: #f8f4ec;
+  --color-warning: #c89b5a;
+  --color-warning-content: #2e241e;
+  --color-error: #b44a30;
+  --color-error-content: #f8f4ec;
+
+  /* Radius — soft, warm feel */
+  --radius-selector: 1rem; /* toggles, badges, avatars */
+  --radius-field: 0.5rem; /* buttons, inputs, tabs */
+  --radius-box: 1rem; /* cards, modals, alerts */
+
+  /* Sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* Border & effects */
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@theme {
+  /* Terracotta highlight — not a daisyUI slot, so expose it as a utility color */
+  --color-highlight: #c76d4e;
+  --color-highlight-content: #f8f4ec;
+
+  /* Typography
+     font-serif  -> Fraunces, the display face (headings only)
+     font-sans   -> Karla, the body face; also the page default via --default-font-family */
+  --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-sans:
+    'Karla', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  html {
+    /* Fraunces is variable on the optical-size axis: let the browser pick the
+       right cut for each size instead of scaling one design up. */
+    font-optical-sizing: auto;
+  }
+
+  /* Fraunces runs wide and loose at display sizes, so pull the tracking in.
+     Applied to the class, not to h1/h2, so it never fights utility classes. */
+  .font-serif {
+    letter-spacing: -0.02em;
+  }
+}
