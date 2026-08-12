@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import MyChatBot from '../components/ChatBot';
 import UserDetails from '../components/User';
+import MusicPlayer from '../components/PlaySong';
 
 const Home = () => {
    
@@ -13,6 +14,9 @@ const Home = () => {
     <div className="grid gap-4 grid-cols-[repeat(auto-fill,30rem)]">
       <div >
         <UserDetails/>
+      </div>
+      <div >
+        <MusicPlayer/>
       </div>
       <div >
         <MyChatBot/>
