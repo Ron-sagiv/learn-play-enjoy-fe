@@ -1,5 +1,3 @@
-// Still needs to configure when the backend is connected:
-// /search must be declared before any /:id route in the same file, otherwise Express will treat "search" as an id.
 import { useState, useEffect, useRef } from 'react';
 
 // Where the backend lives. Change this one line if your route is different.
@@ -13,62 +11,70 @@ const DIFFICULTY_BADGE = {
 };
 
 /**
- * SongSearch
+ * SearchBar
  * A search field with a suggestions dropdown.
  * Props:
  *   onSelect(song) - called when the user picks a song (click or Enter). Optional.
  */
-export default function SongSearch({ onSelect }) {
+export default function SearchBar({ onSelect }) {
   const [query, setQuery] = useState(''); // what the user typed
-  const [results, setResults] = useState([]); // songs coming back from the backend
-  const [isOpen, setIsOpen] = useState(false); // is the dropdown visible
+
+  // Results are stored together with the query they belong to, so the render
+  // can tell whether they are still current. Avoids clearing state in the effect.
+  const [data, setData] = useState({ query: '', songs: [] });
+
   const [isLoading, setIsLoading] = useState(false); // request in flight
+  const [isOpen, setIsOpen] = useState(false); // is the dropdown visible
   const [activeIndex, setActiveIndex] = useState(-1); // highlighted row for arrow keys
 
   const containerRef = useRef(null); // wrapper, used to detect clicks outside
   const inputRef = useRef(null); // the input itself, so we can blur it on Esc
 
+  const trimmed = query.trim();
+
+  // Derived values - no state juggling needed.
+  // Results only count as "ours" if they were fetched for the current query.
+  const results = data.query === trimmed ? data.songs : [];
+  const isSearching =
+    isLoading || (trimmed.length >= 2 && data.query !== trimmed);
+
   /* ---------------------------------------------------------------
      1. Fetch suggestions, debounced.
-     We wait 300ms after the last keystroke so we don't hit the backend
-     on every single letter. The cleanup cancels the pending timer and
-     ignores answers from an outdated request.
+     We wait 300ms after the last keystroke so we don't hit the backend on
+     every letter. No setState runs synchronously here - only inside the
+     timeout callback - which is what the react-hooks lint rule wants.
   ---------------------------------------------------------------- */
   useEffect(() => {
-    const q = query.trim();
-
-    // Nothing meaningful typed yet - clear and stop.
-    if (q.length < 2) {
-      setResults([]);
-      setIsLoading(false);
-      return;
-    }
+    if (trimmed.length < 2) return; // nothing meaningful typed yet
 
     let cancelled = false;
-    setIsLoading(true);
 
     const timer = setTimeout(() => {
-      fetch(`${SEARCH_URL}?q=${encodeURIComponent(q)}`)
+      setIsLoading(true);
+
+      fetch(`${SEARCH_URL}?q=${encodeURIComponent(trimmed)}`)
         .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-        .then((data) => {
+        .then((json) => {
           if (cancelled) return;
           // Accept either a plain array or { songs: [...] }
-          setResults(Array.isArray(data) ? data : (data.songs ?? []));
-          setActiveIndex(-1);
+          const songs = Array.isArray(json) ? json : (json.songs ?? []);
+          setData({ query: trimmed, songs });
         })
         .catch(() => {
-          if (!cancelled) setResults([]);
+          if (!cancelled) setData({ query: trimmed, songs: [] });
         })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
         });
     }, 300);
 
+    // Runs when the query changes or the component unmounts:
+    // cancel the pending request and ignore a late answer.
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query]);
+  }, [trimmed]);
 
   /* ---------------------------------------------------------------
      2. Close on click outside and on Esc.
@@ -130,7 +136,7 @@ export default function SongSearch({ onSelect }) {
   }
 
   // Show the dropdown only when it has something to say.
-  const showDropdown = isOpen && query.trim().length >= 2;
+  const showDropdown = isOpen && trimmed.length >= 2;
 
   return (
     // relative = the anchor the absolute dropdown positions itself against
@@ -157,10 +163,10 @@ export default function SongSearch({ onSelect }) {
           type="search"
           value={query}
           placeholder="Search by song or artist"
-          // typing reopens the dropdown, focusing an existing query reopens it too
           onChange={(e) => {
             setQuery(e.target.value);
-            setIsOpen(true);
+            setIsOpen(true); // typing reopens the dropdown
+            setActiveIndex(-1); // new query, start the highlight over
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
@@ -183,7 +189,6 @@ export default function SongSearch({ onSelect }) {
             type="button"
             onClick={() => {
               setQuery('');
-              setResults([]);
               inputRef.current?.focus();
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center
@@ -212,23 +217,23 @@ export default function SongSearch({ onSelect }) {
         <ul
           id="song-suggestions"
           role="listbox"
-          className="absolute z-50 mt-2 w-full overflow-hidden rounded-box border border-base-300
+          className="absolute z-50 mt-2 w-full rounded-box border border-base-300
                      bg-base-200 shadow-lg max-h-80 overflow-y-auto"
         >
           {/* Loading state */}
-          {isLoading && (
+          {isSearching && (
             <li className="px-4 py-3 text-sm text-neutral">Searching…</li>
           )}
 
           {/* Empty state - only once the request finished */}
-          {!isLoading && results.length === 0 && (
+          {!isSearching && results.length === 0 && (
             <li className="px-4 py-3 text-sm text-neutral">
-              No songs match “{query.trim()}”. Try another title or artist.
+              No songs match “{trimmed}”. Try another title or artist.
             </li>
           )}
 
           {/* Results */}
-          {!isLoading &&
+          {!isSearching &&
             results.map((song, index) => (
               <li
                 key={song._id ?? index}
