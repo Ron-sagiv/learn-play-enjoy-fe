@@ -33,48 +33,46 @@ const MyChatBot = () => {
             const { done, value } = await reader.read();
             if (done) break;
 
-            // Decode chunk byte array to text string
-            const rawChunk = decoder.decode(value, { stream: true });
-            const lines = rawChunk.split('\n');
-
-            for (const line of lines) {
-              //console.log(line);
-              //if (line.startsWith('data:')) {
-              console.log(line);
-              try {
-                //console.log(line.slice(5));
-                //const parsed = line.slice(6)
-                //console.log(parsed);
-                //if (parsed.text) {
-                fullResponseText += line;
-                //console.log(fullResponseText);
-                // Update ChatBotify UI in real-time
-                await params.streamMessage(fullResponseText);
-                //}
-              } catch (e) {
-                // Handle parsing edges or incomplete data chunks smoothly
-                await params.streamMessage(
-                  'Sorry, I am having trouble giving result.',
-                );
-                console.error('Stream error:', error);
-              }
-            }
-            //}
-          }
-        } catch (error) {
-          await params.streamMessage(
-            'Sorry, I am having trouble reaching the agent.',
-          );
-          console.error('Stream error:', error);
+                        // Decode chunk byte array to text string
+                        const rawChunk = decoder.decode(value, { stream: true });
+                        const lines = rawChunk.split('\n');
+                        
+                        for (const line of lines) {
+                            //console.log(line);
+                            //if (line.startsWith('data:')) {
+                                //console.log(line);
+                                try {
+                                    //console.log(line.slice(5));
+                                    //const parsed = line.slice(6)
+                                    //console.log(parsed);
+                                    //if (parsed.text) {
+                                        fullResponseText += line ;
+                                        //console.log(fullResponseText);
+                                        // Update ChatBotify UI in real-time
+                                        sessionStorage.removeItem("rcb-history");
+                                        localStorage.removeItem("rcb-history");
+                                        await params.injectMessage(fullResponseText);
+                                    //}
+                                } catch (e) {
+                                    // Handle parsing edges or incomplete data chunks smoothly
+                                    await params.injectMessage("Sorry, I am having trouble giving result.");
+                                    console.error("Stream error:", error);
+                                }
+                            }
+                        //}
+                    }
+                } catch (error) {
+                    await params.streamMessage("Sorry, I am having trouble reaching the agent.");
+                    console.error("Stream error:", error);
+                }
+                
+                // Return path to cycle back for next user input
+                return "ask anything";
+            },
+            path: "process_query"
         }
-
-        // Return path to cycle back for next user input
-        return 'ask anything';
-      },
-      path: 'process_query',
-    },
-  };
-
+    };
+    
   const settings = {
     isOpen: false,
     general: {
@@ -87,7 +85,7 @@ const MyChatBot = () => {
       disabled: false,
     },
     chatHistory: {
-      storageKey: 'concepts_settings',
+        disabled: true
     },
     header: {
       title: 'Music Chat',
@@ -97,9 +95,13 @@ const MyChatBot = () => {
       text: '2026.Music',
     },
     fileAttachment: {
-      disabled: false,
-      multiple: false,
+        disabled: false,
+        multiple: false
     },
+    chatWindow: {
+    showScrollbar: true,
+    autoJumpToBottom: true
+    }
     // other sections
   };
 
