@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import MyChatBot from '../components/ChatBot';
+import UserDetails from '../components/User';
 import MusicPlayer from '../components/PlaySong';
 
 const Home = () => {
@@ -9,10 +10,13 @@ const Home = () => {
 
     return (
   <div className="p-4">
-    <h1 className="text-2xl font-bold mb-4">Music learn</h1>
+    <h1 className="text-2xl font-bold mb-4">Welcome</h1>
     <div className="grid gap-4 grid-cols-[repeat(auto-fill,30rem)]">
-      <div>
-        <MusicPlayer link="https://res.cloudinary.com/vxudts6v/video/upload/v1785923859/20260805095737_guitar_ringtone_guitar.wav"/>
+      <div >
+        <UserDetails/>
+      </div>
+      <div >
+        <MusicPlayer/>
       </div>
       <div >
         <MyChatBot/>

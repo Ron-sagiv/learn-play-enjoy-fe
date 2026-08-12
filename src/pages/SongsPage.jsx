@@ -8,7 +8,7 @@ export default function SongsPage() {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/songs");
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/songs`);
         if (!response.ok) throw new Error("Failed to fetch songs");
         const data = await response.json();
         setSongs(data);

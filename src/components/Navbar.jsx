@@ -4,14 +4,13 @@ import { NavLink, useNavigate } from 'react-router';
 import { useAuthenticationContext } from '../context/AuthenticationContext';
 
 const Navbar = () => {
-  const { token, deleteToken } = useAuthenticationContext();
+  const  {user, logout}  = useAuthenticationContext();
   const navigate = useNavigate();
-
-  const isAuthenticated = !!token;
+  const isAuthenticated = !!user;
 
   const handleLogout = () => {
-    deleteToken();
-    navigate('/');
+    logout();
+    isAuthenticated=false;
   };
 
   // active link styling, shared by desktop + mobile
@@ -32,12 +31,13 @@ const Navbar = () => {
       {/* Desktop nav */}
       <div className="navbar-end hidden sm:flex">
         <nav className="menu menu-horizontal items-center gap-2 p-2">
+          
           <NavLink to="/" className={linkClass}>
-            Home
+            Welcome
           </NavLink>
-
           {!isAuthenticated ? (
             <>
+            
               <NavLink to="/login" className={linkClass}>
                 Login
               </NavLink>
@@ -49,12 +49,24 @@ const Navbar = () => {
               </NavLink>
             </>
           ) : (
+            <>
+            <NavLink to="/home" className={linkClass}>
+            Home
+              </NavLink>
+            <NavLink to="/songs" className={linkClass}>
+            Songs
+              </NavLink>
             <button
               className="btn btn-outline btn-sm border-secondary text-secondary hover:bg-secondary hover:text-secondary-content"
-              onClick={handleLogout}
+              onClick={() => {
+                handleLogout();
+                window.location.reload();
+                window.location.href = '/';
+              }}
             >
               Logout
             </button>
+            </>
           )}
         </nav>
       </div>

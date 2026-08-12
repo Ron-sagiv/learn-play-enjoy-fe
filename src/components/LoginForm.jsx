@@ -1,122 +1,164 @@
-import { useState } from 'react';
-import { useAuthenticationContext } from '../context/AuthenticationContext';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { Navigate } from "react-router";
+import  {useAuthenticationContext}  from '../context/AuthenticationContext';
 
-const initialState = { email: '', password: '' };
+const USER_STORAGE_KEY = 'lpe_user';
 const LoginForm = () => {
-  const [form, setForm] = useState(initialState);
-  const [error, setError] = useState(null);
-  const { addToken } = useAuthenticationContext();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const [authenticated,setAuthenticated]=useState(false);
+  const  {addUser}  = useAuthenticationContext();
 
-  const handleChange = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    //console.log(e.target.value);
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+    setError('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
     try {
-      const email = form.email;
-      const password = form.password;
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/login`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        },
+      );
 
-      if (!email) throw new Error('Email should not be blank ');
-      if (!password) throw new Error('Password should not be blank ');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      const callApi = async () => {
-        try {
-          const rawResponse = await fetch(
-            'http://localhost:3001/api/auth/login',
-            {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email, password }),
-            },
-          );
-          const content = await rawResponse.json();
+      /* --- Local storage -------------------------------------------------
+         Keep a local copy of the user so the app still knows who is signed
+         in after a page refresh. The backend stays the source of truth,
+         this is only a cache.
 
-          // console.log(content.error);
-          if (content.error) {
-            console.log(content.error);
-            setError('Login failed! ' + content.error);
-          } else {
-            const data = content.token;
-            if (data) {
-              addToken(data);
-              alert('Login successful!');
-              setAuthenticated(true);
-              setForm(initialState);
-            } else {
-              setError('Login failed! ' + error);
-            }
-          }
-        } catch (error) {
-          console.log(error);
-          setError('Login failed! ' + error);
-        }
-      };
-      callApi();
-    } catch (error) {
-      console.log(error);
-      setError('Login failed! ' + error.message);
+         - Written under USER_STORAGE_KEY, the same key the signup page
+           uses, so login just overwrites what signup left behind and the
+           two pages never drift apart.
+         - Stored as a JSON string, because localStorage holds strings only.
+         - `data.user ?? data` covers both response shapes: a backend that
+           wraps the user under a `user` key, and one that returns the user
+           object at the top level.
+         - The password is never stored. Only what the backend sent back.
+         - The token is kept separately, it is what the backend wants on
+           later requests.
+         - Sign out removes both keys, see the note under the component.
+      ------------------------------------------------------------------- */
+          addUser(data.user);
+
+          setAuthenticated(true);
+          setForm(initialState);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-
-
 if(authenticated){
-  return <Navigate to="/" />;
+  return <Navigate to="/home" />;
 }
 
   return (
-   
-    <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-      <legend className="fieldset-legend text-center text-xl">Login</legend>
-      <form onSubmit={handleSubmit}>
-        <label className="label">Email:</label>
-        <input
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          className="input"
-        />
+    <div className="bg-base-100 text-base-content min-h-screen px-4 py-10 sm:px-6 sm:py-16">
+      <form
+        onSubmit={handleLogin}
+        className="bg-base-200 border-base-300 rounded-box mx-auto w-full max-w-md border p-6 shadow-sm sm:p-8"
+      >
+        <header className="mb-8">
+          <p className="text-secondary mb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+            Learn, Play, Enjoy!
+          </p>
+          <h2 className="font-serif text-primary text-3xl font-semibold sm:text-4xl">
+            Welcome back
+          </h2>
+          <p className="text-neutral mt-2 text-sm">
+            Log in to pick up where you left off.
+          </p>
+        </header>
 
-        <label className="label">Password:</label>
-        <input
-          name="password"
-          type={showPassword ? 'text' : 'password'}
-          value={form.password}
-          onChange={handleChange}
-          className="input"
-        />
-        <br />
-        <label className="label mt-0.75" for="check">
-          <input
-            id="check"
-            type="checkbox"
-            value={showPassword}
-            onChange={() => setShowPassword((prev) => !prev)}
-          />
-          Show Password
-        </label>
-        <br />
-        <button name="submit" type="submit" className="btn btn-neutral mt-4">
-          Login
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="input input-bordered bg-base-100 w-full"
+            />
+
+            <label className="text-neutral mt-2.5 flex w-fit cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={(e) => setShowPassword(e.target.checked)}
+                className="checkbox checkbox-sm checkbox-primary"
+              />
+              Show password
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" className="btn btn-primary mt-8 w-full">
+          Log in
         </button>
-        <br />
-        <div className="text-red-500 mt-2">{error && <p>{error}</p>}</div>
+
+        {error && (
+          <div
+            role="alert"
+            className="bg-error/10 border-error/30 text-error rounded-field mt-6 border px-4 py-3 text-sm"
+          >
+            {error}
+          </div>
+        )}
+
+        <p className="text-neutral mt-6 text-center text-sm">
+          New here?{' '}
+          <Link
+            to="/signup"
+            className="link link-hover text-primary font-medium"
+          >
+            Create an account
+          </Link>
+        </p>
       </form>
-    </fieldset>
-);
-};
+    </div>
+  );
+}
 
 export default LoginForm;
+/* --- Signing out -----------------------------------------------------
+   Wherever your sign-out button lives:
+
+     import { USER_STORAGE_KEY } from '../pages/SignUpPage';
+
+     const handleSignOut = () => {
+       localStorage.removeItem(USER_STORAGE_KEY);
+       localStorage.removeItem('token');
+       navigate('/login');
+     };
+--------------------------------------------------------------------- */
