@@ -1,33 +1,29 @@
 import { createContext , useState, useContext} from "react";
 
 const AuthenticationContext= createContext();
+const USER_STORAGE_KEY = 'lpe_user';
 
 export default function AuthenticationProvider({ children }) {
-  const tokenEntry = JSON.parse(localStorage.getItem('token')) || '';
-  //const [entrys, setEntrys] = useState(allEntrys);
-  const[token, setToken] = useState(tokenEntry);
-
-  const addToken = (tokenEntry) => {
-    
-     // const updatedEntrys = [tokenEntry,...entrys];
-      localStorage.setItem('token', JSON.stringify(tokenEntry));
-      //setEntrys(JSON.parse(localStorage.getItem('allentrys')) || []);
-    setToken(getToken());
+  const userEntry = JSON.parse(localStorage.getItem(USER_STORAGE_KEY)) || '';
+  const[user, setUser] = useState(userEntry);
+  
+  const addUser = (user) => {
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    setUser(getUser());
   };
 
-  const deleteToken = () => {
+  const logout = () => {
     
-      localStorage.setItem('token', JSON.stringify(''));
-      //setEntrys(JSON.parse(localStorage.getItem('allentrys')) || []);
-    setToken(getToken());
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(''));
+    setUser(getUser());
   };
 
-  const getToken = () => {
-    return JSON.parse(localStorage.getItem('token')) || '';
+  const getUser = () => {
+    return JSON.parse(localStorage.getItem(USER_STORAGE_KEY)) || '';
   };
 
   return (
-    <AuthenticationContext.Provider value={{token, addToken, deleteToken}}>
+    <AuthenticationContext.Provider value={{addUser, user,logout}}>
       {children}
     </AuthenticationContext.Provider>
   );

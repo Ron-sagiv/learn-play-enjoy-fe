@@ -1,108 +1,268 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+
 import { Navigate } from "react-router";
+import  {useAuthenticationContext}  from '../context/AuthenticationContext';
 
-const initialState = { email: '', password: '' };
-const SignUpForm = () => {
-  const [form, setForm] = useState(initialState);
-  const [error, setError] = useState(null);
+
+const Required = () => (
+  <span className="text-highlight ml-0.5" aria-hidden="true">
+    *
+  </span>
+);
+export default function SignUpPage() {
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [usercategory, setUsercategory] = useState('');
+  const [level, setLevel] = useState('');
+  const [instrument, setInstrument] = useState('');
+  const [favband, setFavband] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [signedin,setSignedin]=useState(false);
+  const [authenticated,setAuthenticated]=useState(false);
+  const  {addUser}  = useAuthenticationContext();
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    //console.log(e.target.value);
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const email = form.email;
-      const password = form.password;
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            usercategory,
+            level,
+            instrument,
+            favband,
+          }),
+        },
+      );
 
-      if (!email) throw new Error('Email should not be blank ');
-      if (!password) throw new Error('Password should not be blank ');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
 
-      const callApi = async () => {
-        try {
-          const rawResponse = await fetch('http://localhost:3001/api/users', {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-          //console.log(rawResponse);
+      /* --- Local storage -------------------------------------------------
+         Keep a local copy of the user so the app still knows who signed up
+         after a page refresh. The backend stays the source of truth, this
+         is only a cache.
 
-          const content = await rawResponse.json();
-          //console.log(content);
-          if (content.error) {
-            console.log(error);
-            setError('Signup failed! ' + content.error);
-          } else {
-            setForm(initialState);
-            setSignedin(true);
-          }
-        } catch (error) {
-          console.log(error);
-          setError('Signup failed! ' + error);
-        }
-      };
-      callApi();
-    } catch (error) {
-      console.log(error);
-      setError('Signup failed! ' + error);
+         - Stored as a JSON string, because localStorage holds strings only.
+         - `data.user ?? data` covers both response shapes: a backend that
+           wraps the user under a `user` key, and one that returns the user
+           object at the top level.
+         - The password is never stored. Only what the backend sent back.
+         - Cleared on sign out, see the note under the component.
+      ------------------------------------------------------------------- */
+       
+        addUser(data.user);
+          setAuthenticated(true);
+          setForm(initialState);
+          setSuccess('Registered successfully! Redirecting to home...');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
-  if(signedin){
-  return <Navigate to="/login" />;
-}
+  if(authenticated){
+    return <Navigate to="/home" />;
+  }
+  
   return (
-    <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-      <legend className="fieldset-legend text-center text-xl ">Sign Up</legend>
-      <form onSubmit={handleSubmit}>
-        <label className="label">Email:</label>
-        <input
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          className="input"
-          // placeholder="Email"
-        />
+    <div className="bg-base-100 text-base-content min-h-screen px-4 py-10 sm:px-6 sm:py-16">
+      <form
+        onSubmit={handleRegister}
+        className="bg-base-200 border-base-300 rounded-box mx-auto w-full max-w-md border p-6 shadow-sm sm:p-8"
+      >
+        <header className="mb-8">
+          <p className="text-secondary mb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+            Learn, Play, Enjoy!
+          </p>
+          <h2 className="font-serif text-primary text-3xl font-semibold sm:text-4xl">
+            Create your account
+          </h2>
+          <p className="text-neutral mt-2 text-sm">
+            Fields marked <Required /> are required.
+          </p>
+        </header>
 
-        <label className="label">Password:</label>
-        <input
-          name="password"
-          type={showPassword ? 'text' : 'password'}
-          value={form.password}
-          onChange={handleChange}
-          className="input"
-          // placeholder="Password"
-        />
-        <label className="label mt-0.75" for="check">
-          <input
-            id="check"
-            type="checkbox"
-            value={showPassword}
-            onChange={() => setShowPassword((prev) => !prev)}
-          />
-          Show Password
-        </label>
-        <br />
-        <button name="submit" type="submit" className="btn btn-neutral mt-4">
-          Register
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
+              Name
+              <Required />
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
+              Email
+              <Required />
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Password
+              <Required />
+            </label>
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input input-bordered bg-base-100 w-full"
+            />
+
+            <label className="text-neutral mt-2.5 flex w-fit cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={(e) => setShowPassword(e.target.checked)}
+                className="checkbox checkbox-sm checkbox-primary"
+              />
+              Show password
+            </label>
+          </div>
+
+          <div>
+            <label
+              htmlFor="usercategory"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              I am a
+              <Required />
+            </label>
+            <select
+              id="usercategory"
+              value={usercategory}
+              onChange={(e) => setUsercategory(e.target.value)}
+              required
+              className="select select-bordered bg-base-100 w-full"
+            >
+              <option value="" disabled>
+                Select a category
+              </option>
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="border-base-300 mt-8 mb-5 flex items-center gap-3 border-t pt-6">
+          <span className="text-neutral text-xs font-semibold tracking-[0.14em] uppercase">
+            A little about you
+          </span>
+          <span className="text-neutral/70 text-xs">optional</span>
+        </div>
+
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="level" className="mb-1.5 block text-sm font-medium">
+              Level
+            </label>
+            <input
+              id="level"
+              type="text"
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              placeholder="Beginner, intermediate, advanced"
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="instrument"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Instrument
+            </label>
+            <input
+              id="instrument"
+              type="text"
+              value={instrument}
+              onChange={(e) => setInstrument(e.target.value)}
+              placeholder="Acoustic guitar"
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="favband"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Favorite band
+            </label>
+            <input
+              id="favband"
+              type="text"
+              value={favband}
+              onChange={(e) => setFavband(e.target.value)}
+              placeholder="Who made you pick up a guitar?"
+              className="input input-bordered bg-base-100 w-full"
+            />
+          </div>
+        </div>
+
+        <button type="submit" className="btn btn-primary mt-8 w-full">
+          Create account
         </button>
-        <br />
-        <div className="text-red-500 mt-2">{error && <p>{error}</p>}</div>
-      </form>
-    </fieldset>
-  );
-};
 
-export default SignUpForm;
+        {error && (
+          <div
+            role="alert"
+            className="bg-error/10 border-error/30 text-error rounded-field mb-6 border px-4 py-3 text-sm"
+          >
+            {error}
+          </div>
+        )}
+        {success && (
+          <div
+            role="alert"
+            className="bg-success/10 border-success/30 text-success rounded-field mb-6 border px-4 py-3 text-sm"
+          >
+            {success}
+          </div>
+        )}
+
+        <p className="text-neutral mt-6 text-center text-sm">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="link link-hover text-primary font-medium"
+          >
+            Log in
+          </Link>
+        </p>
+      </form>
+    </div>
+  );
+}
