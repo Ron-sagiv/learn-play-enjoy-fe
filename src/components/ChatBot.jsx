@@ -35,7 +35,7 @@ const MyChatBot = () => {
                         const lines = rawChunk.split('\n');
                         
                         for (const line of lines) {
-                            //console.log(line);
+                            console.log(line);
                             //if (line.startsWith('data:')) {
                                 console.log(line);
                                 try {
@@ -46,11 +46,13 @@ const MyChatBot = () => {
                                         fullResponseText += line ;
                                         //console.log(fullResponseText);
                                         // Update ChatBotify UI in real-time
-                                        await params.streamMessage(fullResponseText);
+                                        sessionStorage.removeItem("rcb-history");
+                                        localStorage.removeItem("rcb-history");
+                                        await params.injectMessage(fullResponseText);
                                     //}
                                 } catch (e) {
                                     // Handle parsing edges or incomplete data chunks smoothly
-                                    await params.streamMessage("Sorry, I am having trouble giving result.");
+                                    await params.injectMessage("Sorry, I am having trouble giving result.");
                                     console.error("Stream error:", error);
                                 }
                             }
@@ -80,7 +82,7 @@ const MyChatBot = () => {
       disabled: false,
     },
     chatHistory: {
-      storageKey: "concepts_settings"
+        disabled: true
     },
     header: {
         title: "Music Chat",
@@ -92,6 +94,10 @@ const MyChatBot = () => {
     fileAttachment: {
         disabled: false,
         multiple: false
+    },
+    chatWindow: {
+    showScrollbar: true,
+    autoJumpToBottom: true
     }
     // other sections
   }; 
