@@ -5,6 +5,7 @@ import LessonsCarousel from '../components/LessonsCarousel';
 import OriginalVideo from '../components/OriginalVideo';
 import BackingTrack from '../components/BackingTrack';
 import TabContent from '../components/TabContent';
+import { saveLastSong } from '../utils/lastSong';
 
 // Same mapping as Home / SearchBar.
 const DIFFICULTY_BADGE = {
@@ -27,6 +28,7 @@ const SingleSongPage = () => {
       .then((data) => {
         setSong(data);
         setSaved(isSongSaved(data.id));
+        saveLastSong(data);
       })
       .catch(() => setError('We could not find this song.'));
   }, [id]);
