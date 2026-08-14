@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
 
-// Where the backend lives. Change this one line if your route is different.
-const SEARCH_URL = '/api/songs/search';
+const SEARCH_URL = `${import.meta.env.VITE_API_BASE_URL}/api/songs/search`;
 
 // Difficulty -> daisyUI badge color, using your theme slots.
 const DIFFICULTY_BADGE = {
@@ -12,40 +12,36 @@ const DIFFICULTY_BADGE = {
 
 /**
  * SearchBar
- * A search field with a suggestions dropdown.
- * Props:
- *   onSelect(song) - called when the user picks a song (click or Enter). Optional.
+ * Search field with a suggestions dropdown.
+ * Picking a song opens its page, unless a parent passes onSelect.
  */
 export default function SearchBar({ onSelect }) {
-  const [query, setQuery] = useState(''); // what the user typed
+  const navigate = useNavigate();
 
-  // Results are stored together with the query they belong to, so the render
-  // can tell whether they are still current. Avoids clearing state in the effect.
+  const [query, setQuery] = useState('');
+
+  // Results are stored with the query they belong to, so the render can tell
+  // whether they are still current.
   const [data, setData] = useState({ query: '', songs: [] });
 
-  const [isLoading, setIsLoading] = useState(false); // request in flight
-  const [isOpen, setIsOpen] = useState(false); // is the dropdown visible
-  const [activeIndex, setActiveIndex] = useState(-1); // highlighted row for arrow keys
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
-  const containerRef = useRef(null); // wrapper, used to detect clicks outside
-  const inputRef = useRef(null); // the input itself, so we can blur it on Esc
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const trimmed = query.trim();
 
-  // Derived values - no state juggling needed.
-  // Results only count as "ours" if they were fetched for the current query.
   const results = data.query === trimmed ? data.songs : [];
   const isSearching =
     isLoading || (trimmed.length >= 2 && data.query !== trimmed);
 
   /* ---------------------------------------------------------------
-     1. Fetch suggestions, debounced.
-     We wait 300ms after the last keystroke so we don't hit the backend on
-     every letter. No setState runs synchronously here - only inside the
-     timeout callback - which is what the react-hooks lint rule wants.
+     1. Fetch suggestions, debounced 300ms.
   ---------------------------------------------------------------- */
   useEffect(() => {
-    if (trimmed.length < 2) return; // nothing meaningful typed yet
+    if (trimmed.length < 2) return;
 
     let cancelled = false;
 
@@ -56,7 +52,6 @@ export default function SearchBar({ onSelect }) {
         .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
         .then((json) => {
           if (cancelled) return;
-          // Accept either a plain array or { songs: [...] }
           const songs = Array.isArray(json) ? json : (json.songs ?? []);
           setData({ query: trimmed, songs });
         })
@@ -68,8 +63,6 @@ export default function SearchBar({ onSelect }) {
         });
     }, 300);
 
-    // Runs when the query changes or the component unmounts:
-    // cancel the pending request and ignore a late answer.
     return () => {
       cancelled = true;
       clearTimeout(timer);
@@ -78,8 +71,6 @@ export default function SearchBar({ onSelect }) {
 
   /* ---------------------------------------------------------------
      2. Close on click outside and on Esc.
-     Both listeners sit on the document because the click/keypress can
-     happen anywhere on the page, not just inside this component.
   ---------------------------------------------------------------- */
   useEffect(() => {
     function handleClickOutside(event) {
@@ -107,43 +98,49 @@ export default function SearchBar({ onSelect }) {
   }, []);
 
   /* ---------------------------------------------------------------
-     3. Picking a song: fill the input, close the dropdown, tell the parent.
+     3. Picking a song: close up, then open its page.
+        A parent can take over by passing onSelect.
   ---------------------------------------------------------------- */
   function handleSelect(song) {
-    setQuery(song.title);
     setIsOpen(false);
     setActiveIndex(-1);
-    onSelect?.(song);
+    inputRef.current?.blur(); // stops the mobile keyboard covering the next page
+
+    if (onSelect) {
+      setQuery(song.title);
+      onSelect(song);
+      return;
+    }
+
+    setQuery(''); // leave the field clean for the next search
+    navigate(`/songs/${song.id ?? song._id}`);
   }
 
   /* ---------------------------------------------------------------
-     4. Keyboard navigation inside the input: arrows move the highlight,
-        Enter picks the highlighted row.
+     4. Keyboard navigation. Enter with nothing highlighted picks the
+        first result, which is what people expect after typing.
   ---------------------------------------------------------------- */
   function handleKeyDown(event) {
     if (!isOpen || results.length === 0) return;
 
     if (event.key === 'ArrowDown') {
-      event.preventDefault(); // stop the caret from jumping in the input
+      event.preventDefault();
       setActiveIndex((i) => (i + 1) % results.length);
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       setActiveIndex((i) => (i <= 0 ? results.length - 1 : i - 1));
-    } else if (event.key === 'Enter' && activeIndex >= 0) {
+    } else if (event.key === 'Enter') {
       event.preventDefault();
-      handleSelect(results[activeIndex]);
+      handleSelect(results[activeIndex >= 0 ? activeIndex : 0]);
     }
   }
 
-  // Show the dropdown only when it has something to say.
   const showDropdown = isOpen && trimmed.length >= 2;
 
   return (
-    // relative = the anchor the absolute dropdown positions itself against
-    <div ref={containerRef} className="relative w-full max-w-xl mx-auto">
+    <div ref={containerRef} className="relative mx-auto w-full max-w-xl">
       {/* ---------- Input row ---------- */}
       <div className="relative">
-        {/* Magnifier icon, sits inside the field on the left */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -151,7 +148,7 @@ export default function SearchBar({ onSelect }) {
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
-          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral"
+          className="text-neutral pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2"
           aria-hidden="true"
         >
           <circle cx="11" cy="11" r="7" />
@@ -165,25 +162,18 @@ export default function SearchBar({ onSelect }) {
           placeholder="Search by song or artist"
           onChange={(e) => {
             setQuery(e.target.value);
-            setIsOpen(true); // typing reopens the dropdown
-            setActiveIndex(-1); // new query, start the highlight over
+            setIsOpen(true);
+            setActiveIndex(-1);
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          // pl-12 leaves room for the icon, pr-11 for the clear button
-          className="w-full rounded-field border border-base-300 bg-base-100 py-3 pl-12 pr-11
-                     text-base text-base-content placeholder:text-neutral
-                     outline-none transition-colors
-                     focus:border-primary focus:ring-2 focus:ring-primary/30
-                     [&::-webkit-search-cancel-button]:appearance-none"
-          // accessibility: tells screen readers this input drives a listbox
+          className="rounded-field border-base-300 bg-base-100 text-base-content placeholder:text-neutral focus:border-primary focus:ring-primary/30 w-full border py-3 pr-11 pl-12 text-base outline-none transition-colors focus:ring-2 [&::-webkit-search-cancel-button]:appearance-none"
           role="combobox"
           aria-expanded={showDropdown}
           aria-controls="song-suggestions"
           aria-autocomplete="list"
         />
 
-        {/* Clear button - only when there is text */}
         {query && (
           <button
             type="button"
@@ -191,11 +181,9 @@ export default function SearchBar({ onSelect }) {
               setQuery('');
               inputRef.current?.focus();
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center
-                       rounded-full text-neutral transition-colors hover:bg-base-300 hover:text-base-content"
+            className="text-neutral hover:bg-base-300 hover:text-base-content absolute top-1/2 right-3 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full transition-colors"
             aria-label="Clear search"
           >
-            {/* small × */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -217,49 +205,45 @@ export default function SearchBar({ onSelect }) {
         <ul
           id="song-suggestions"
           role="listbox"
-          className="absolute z-50 mt-2 w-full rounded-box border border-base-300
-                     bg-base-200 shadow-lg max-h-80 overflow-y-auto"
+          className="rounded-box border-base-300 bg-base-200 absolute z-50 mt-2 max-h-80 w-full overflow-y-auto border shadow-lg"
         >
-          {/* Loading state */}
           {isSearching && (
-            <li className="px-4 py-3 text-sm text-neutral">Searching…</li>
+            <li className="text-neutral px-4 py-3 text-sm">Searching…</li>
           )}
 
-          {/* Empty state - only once the request finished */}
           {!isSearching && results.length === 0 && (
-            <li className="px-4 py-3 text-sm text-neutral">
+            <li className="text-neutral px-4 py-3 text-sm">
               No songs match “{trimmed}”. Try another title or artist.
             </li>
           )}
 
-          {/* Results */}
           {!isSearching &&
             results.map((song, index) => (
               <li
-                key={song._id ?? index}
+                key={song.id ?? song._id ?? index}
                 role="option"
                 aria-selected={index === activeIndex}
               >
                 <button
                   type="button"
                   onClick={() => handleSelect(song)}
-                  onMouseEnter={() => setActiveIndex(index)} // hover follows the keyboard highlight
-                  className={`flex w-full items-center justify-between gap-3 border-b border-base-300/60
-                              px-4 py-3 text-left transition-colors last:border-b-0
-                              ${index === activeIndex ? 'bg-base-300' : 'hover:bg-base-300/60'}`}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  className={`border-base-300/60 flex w-full items-center justify-between gap-3 border-b px-4 py-3 text-left transition-colors last:border-b-0 ${
+                    index === activeIndex
+                      ? 'bg-base-300'
+                      : 'hover:bg-base-300/60'
+                  }`}
                 >
                   <span className="min-w-0">
-                    {/* Title in the display face, artist muted underneath */}
-                    <span className="block truncate font-serif font-semibold text-base-content">
+                    <span className="font-serif text-base-content block truncate font-semibold">
                       {song.title}
                     </span>
-                    <span className="block truncate text-sm text-neutral">
+                    <span className="text-neutral block truncate text-sm">
                       {song.artist}
                       {song.genre ? ` · ${song.genre}` : ''}
                     </span>
                   </span>
 
-                  {/* Difficulty badge */}
                   {song.difficulty && (
                     <span
                       className={`badge badge-sm shrink-0 ${DIFFICULTY_BADGE[song.difficulty] ?? ''}`}
