@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 import { isSongSaved, saveSong, removeSavedSong } from '../utils/savedSongs';
 import LessonsCarousel from '../components/LessonsCarousel';
 import OriginalVideo from '../components/OriginalVideo';
+import BackingTrack from '../components/BackingTrack';
 
 // Same mapping as Home / SearchBar.
 const DIFFICULTY_BADGE = {
@@ -83,6 +84,7 @@ const SingleSongPage = () => {
             </header>
             <LessonsCarousel song={song} />
             <OriginalVideo song={song} />
+            <BackingTrack song={song} />
           </>
         )}
       </div>
