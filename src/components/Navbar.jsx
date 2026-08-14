@@ -1,16 +1,15 @@
-import { useEffect } from 'react';
-
 import { NavLink, useNavigate } from 'react-router';
 import { useAuthenticationContext } from '../context/AuthenticationContext';
 
 const Navbar = () => {
-  const  {user, logout}  = useAuthenticationContext();
+  const { user, logout } = useAuthenticationContext();
   const navigate = useNavigate();
   const isAuthenticated = !!user;
 
+  // logout() clears the user, which re-renders this navbar. No reload needed.
   const handleLogout = () => {
     logout();
-    isAuthenticated=false;
+    navigate('/');
   };
 
   // active link styling, shared by desktop + mobile
@@ -18,10 +17,13 @@ const Navbar = () => {
     `btn btn-ghost btn-sm ${isActive ? 'text-primary font-semibold' : ''}`;
 
   return (
-    <div className="navbar bg-base-100 border-b-2 border-accent/30 sticky top-0 z-50 px-4">
+    <div className="navbar bg-base-100 border-accent/30 sticky top-0 z-50 border-b-2 px-4">
       {/* Brand */}
       <div className="navbar-start">
-        <NavLink to="/" className="btn btn-ghost text-xl font-bold gap-1 px-2">
+        <NavLink
+          to={isAuthenticated ? '/home' : '/'}
+          className="btn btn-ghost gap-1 px-2 text-xl font-bold"
+        >
           <span className="text-primary">Learn,</span>
           <span className="text-secondary">Play,</span>
           <span className="text-accent">Enjoy!</span>
@@ -31,13 +33,8 @@ const Navbar = () => {
       {/* Desktop nav */}
       <div className="navbar-end hidden sm:flex">
         <nav className="menu menu-horizontal items-center gap-2 p-2">
-          
-          <NavLink to="/" className={linkClass}>
-            Welcome
-          </NavLink>
           {!isAuthenticated ? (
             <>
-            
               <NavLink to="/login" className={linkClass}>
                 Login
               </NavLink>
@@ -50,22 +47,15 @@ const Navbar = () => {
             </>
           ) : (
             <>
-            <NavLink to="/home" className={linkClass}>
-            Home
+              <NavLink to="/home" className={linkClass}>
+                Home
               </NavLink>
-            <NavLink to="/songs" className={linkClass}>
-            Songs
-              </NavLink>
-            <button
-              className="btn btn-outline btn-sm border-secondary text-secondary hover:bg-secondary hover:text-secondary-content"
-              onClick={() => {
-                handleLogout();
-                window.location.reload();
-                window.location.href = '/';
-              }}
-            >
-              Logout
-            </button>
+              <button
+                className="btn btn-outline btn-sm border-secondary text-secondary hover:bg-secondary hover:text-secondary-content"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
             </>
           )}
         </nav>
@@ -93,9 +83,6 @@ const Navbar = () => {
             tabIndex={0}
             className="menu dropdown-content bg-base-200 rounded-box z-50 mt-3 w-52 gap-1 p-2 shadow-lg"
           >
-            <li>
-              <NavLink to="/">Home</NavLink>
-            </li>
             {!isAuthenticated ? (
               <>
                 <li>
@@ -111,9 +98,14 @@ const Navbar = () => {
                 </li>
               </>
             ) : (
-              <li>
-                <button onClick={handleLogout}>Logout</button>
-              </li>
+              <>
+                <li>
+                  <NavLink to="/home">Home</NavLink>
+                </li>
+                <li>
+                  <button onClick={handleLogout}>Logout</button>
+                </li>
+              </>
             )}
           </ul>
         </div>
