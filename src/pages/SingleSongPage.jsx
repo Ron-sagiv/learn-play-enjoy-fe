@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { isSongSaved, saveSong, removeSavedSong } from '../utils/savedSongs';
 import LessonsCarousel from '../components/LessonsCarousel';
+import OriginalVideo from '../components/OriginalVideo';
 
+// Same mapping as Home / SearchBar.
+const DIFFICULTY_BADGE = {
+  Beginner: 'badge-success',
+  Intermediate: 'badge-warning',
+  Advanced: 'badge-error',
+};
 const SingleSongPage = () => {
   const { id } = useParams();
   const [song, setSong] = useState(null);
@@ -51,6 +58,20 @@ const SingleSongPage = () => {
                 <p className="text-neutral mt-2 text-base sm:text-lg">
                   {song.artist}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {song.difficulty && (
+                    <span
+                      className={`badge badge-sm ${DIFFICULTY_BADGE[song.difficulty] ?? ''}`}
+                    >
+                      {song.difficulty}
+                    </span>
+                  )}
+                  {song.genre && (
+                    <span className="badge badge-sm badge-outline border-base-300 text-neutral">
+                      {song.genre}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <button
@@ -61,6 +82,7 @@ const SingleSongPage = () => {
               </button>
             </header>
             <LessonsCarousel song={song} />
+            <OriginalVideo song={song} />
           </>
         )}
       </div>
