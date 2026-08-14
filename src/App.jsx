@@ -7,24 +7,26 @@ import NotFound from './pages/NotFound';
 import Welcome from './pages/Welcome';
 import SongsPage from './pages/SongsPage';
 import ProtectedLayout from './layouts/ProtectedLayout';
+import SingleSongPage from './pages/SingleSongPage';
 
 const App = () => {
-    return (
-        <div>
-            <Routes>
-                <Route element={<MainLayout />}>
-                    <Route path="/" element={<Welcome />} />
-                    <Route path="/signup" element={<SignUpPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route element={<ProtectedLayout />}>
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/songs" element={<SongsPage />} />
-                    </Route>
-                </Route>
-                <Route path="*" element={<NotFound />} />
-            </Routes>
-        </div>
-    );
+  return (
+    <div>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedLayout />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/songs" element={<SongsPage />} />
+            <Route path="/songs/:id" element={<SingleSongPage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 };
 
 export default App;
