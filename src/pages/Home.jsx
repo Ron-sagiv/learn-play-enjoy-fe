@@ -5,6 +5,7 @@ import MusicPlayer from '../components/PlaySong';
 import SearchBar from '../components/SearchBar';
 import { useAuthenticationContext } from '../context/AuthenticationContext';
 import { getLastSong } from '../utils/lastSong';
+import { getSavedSongs, removeSavedSong } from '../utils/savedSongs';
 
 // Difficulty -> daisyUI badge color, same mapping as SearchBar.
 const DIFFICULTY_BADGE = {
@@ -17,6 +18,7 @@ const Home = () => {
   const { user } = useAuthenticationContext();
   const lastSong = getLastSong();
   const [suggestions, setSuggestions] = useState([]);
+  const [savedSongs, setSavedSongs] = useState(getSavedSongs);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}/api/songs`)
@@ -125,6 +127,54 @@ const Home = () => {
         <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
           <MusicPlayer />
         </div>
+
+        {/* ---------- Saved songs ---------- */}
+        <section>
+          <h2 className="font-serif text-accent mb-4 text-2xl font-semibold sm:text-3xl">
+            Your saved songs
+          </h2>
+
+          {savedSongs.length === 0 ? (
+            <p className="text-neutral border-base-300 rounded-box border border-dashed p-5 text-sm">
+              Nothing saved yet. Open a song and tap “Save song” to keep it
+              here.
+            </p>
+          ) : (
+            <ul className="divide-base-300 bg-base-200 border-base-300 rounded-box divide-y border">
+              {savedSongs.map((song) => (
+                <li key={song.id} className="flex items-center gap-3 p-4">
+                  <Link
+                    to={`/songs/${song.id}`}
+                    className="group min-w-0 flex-1"
+                  >
+                    <span className="font-serif text-primary group-hover:text-highlight block truncate font-semibold transition-colors">
+                      {song.title}
+                    </span>
+                    <span className="text-neutral block truncate text-sm">
+                      {song.artist}
+                    </span>
+                  </Link>
+
+                  {song.difficulty && (
+                    <span
+                      className={`badge badge-sm hidden sm:inline-flex ${DIFFICULTY_BADGE[song.difficulty] ?? ''}`}
+                    >
+                      {song.difficulty}
+                    </span>
+                  )}
+
+                  <button
+                    onClick={() => setSavedSongs(removeSavedSong(song.id))}
+                    aria-label={`Remove ${song.title}`}
+                    className="btn btn-ghost btn-xs text-neutral hover:text-error shrink-0"
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <MyChatBot />
       </div>
