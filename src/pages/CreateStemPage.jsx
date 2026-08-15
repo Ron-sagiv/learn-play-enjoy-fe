@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useAuthenticationContext } from '../context/AuthenticationContext';
-import { Navigate } from "react-router";
+import { NavLink } from "react-router";
+
 
 const CreateStem = () => {
-  //const { token } = useAuthenticationContext();
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [redirect,setRedirect]=useState('');
@@ -17,11 +16,6 @@ const CreateStem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    //console.log('Token: ', token);
-    //console.log('formData: ', formData);
-    //const token=JSON.parse(localStorage.getItem('token')) || '';
-    //if(token){
         const formData  = new FormData();
         const bodyText={stemType: 'Guitar'};
 
@@ -46,9 +40,6 @@ const CreateStem = () => {
         } else {
           setError('Error creating stem , check console log for more details...');
         }
-    //}else{
-     // setRedirect('/login');
-    //}   
   };
 
   if(redirect){
@@ -56,17 +47,25 @@ const CreateStem = () => {
 }
   return (
     <div className="">
+      <NavLink to="/stems" className="btn gap-1 px-2 text-xl font-bold">
+                Back to StemAnalyzer
+    </NavLink>
       <div className="">
         <div className="">
-          <h2 className="">
-            Create New Song Stem Analysis
+          <h2 className="text-xl font-bold mb-4">
+            Upload New Song Stem Analysis
           </h2>
 
           <form className="">
-            <input id="file" type="file" onChange={handleFileChange} />
+            <input id="file" type="file" onChange={handleFileChange} className="text-sm text-stone-500
+                  file:mr-5 file:py-1 file:px-3 file:border-[1px]
+                    file:text-xs file:font-medium
+                       file:bg-stone-50 file:text-stone-700
+                            hover:file:cursor-pointer hover:file:bg-blue-50
+                         hover:file:text-grey-700"/>
             
             {file && (
-                <button  onClick={handleSubmit} className="" >StartAnalysis</button>
+                <button  onClick={handleSubmit} className="p-1 btn btn-sm text-primary font-semibold" >StartAnalysis</button>
             )}
             
           </form>

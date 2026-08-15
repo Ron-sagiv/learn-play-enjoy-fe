@@ -6,7 +6,8 @@ import { NavLink } from 'react-router';
 import MusicPlayer from '../components/PlaySong';
 
 const StemDetails = () => {
-  //const { token } = useAuthenticationContext();
+  const  {user}  = useAuthenticationContext();
+  const isAuthenticated = !!user;
   const { id } = useParams();
   const [audiofile, setAudiofile] = useState([]);
   const [error, setError] = useState(null);
@@ -18,7 +19,7 @@ const StemDetails = () => {
   
 
   useEffect(() => {
-    //console.log("id:", id);
+    if(isAuthenticated){
     fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audiofiles/${id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -32,11 +33,11 @@ const StemDetails = () => {
         setError(null);
       })
       .catch((err) => {
-        //console.error('Error fetching audiofile details:', err);
         setError(
           'Error fetching audio file details , check console log for more details...',
         );
       });
+      }
   }, [id]);
 
   if (error) {
@@ -49,20 +50,14 @@ const StemDetails = () => {
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this analyzed song?')) return;
 
-   // const token=JSON.parse(localStorage.getItem('token')) || '';
-    //console.log("token:",token);
-   // if(token){
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audiofiles/${id}`, {
           method: 'DELETE',
-          headers: {
-            //Authorization: `Bearer ${token}`,
-          },
+          
         });
 
         if (response.ok) {
           alert('Audio Records deleted successfully!');
-          //window.location.href = '/';
           setRedirect('/stems');
         } else {
           const errorData = await response.json();
@@ -73,10 +68,6 @@ const StemDetails = () => {
         console.error('Error deleting audiofile:', error);
         setError('Error deleting audiofile , check console log for more details...');
       }
-   // }else{
-      //window.location.href = '/login';
-     // setRedirect('/login');
-    // }
   };
   
 
@@ -88,37 +79,48 @@ const StemDetails = () => {
     <div>
     
 
-    <NavLink to="/stems" className="btn btn-ghost gap-1 px-2 text-xl font-bold">
-                Go to StemAnalyzer
+    <NavLink to="/stems" className="btn gap-1 px-2 text-xl font-bold">
+                Back to StemAnalyzer
     </NavLink>
 
-    <div className="">
+    <div className="card ">
       <div className="">
-        <h1 className="">{filename}</h1>
-       
-          <div className="">
-            Details: 
-          </div>
-            <div className="">
-            Input file link: {audiofile.inputFile} <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
-          <MusicPlayer link={audiofile.inputFile}/>
-        </div>
-          </div>
-
-          <div className="">
-            Output file link: {audiofile.outputFile} <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
-          <MusicPlayer link={audiofile.outputFile}/>
-        </div>
-          </div>
-
-
         
-        <div className="">
-          <button onClick={handleDelete} className="">
+       
+          <div className="p-2 text-center">
+            <h1 className='text-xl font-bold mb-4'>Details: Listen the original and the Guitar </h1>
+          </div>
+            
+            <div className="p-2">
+            <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
+              <h2>Original file :</h2>
+              <a href={audiofile.inputFile}>{audiofile.inputFile?.split('-')[1]}</a>
+              <MusicPlayer link={audiofile.inputFile}/>
+            </div>  
+            </div> 
+            
+            <br/>
+
+
+            <div className="p-2">
+            <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
+              <h2>After Stem Analyzed Guitar file :</h2>
+              <a href={audiofile.outputFile}>{audiofile.outputFile?.split('-')[1]}</a>
+              <MusicPlayer link={audiofile.outputFile}/>
+            </div>
+            </div>
+           
+
+         
+          </div>
+
+        <br/>
+        
+        <div className="p-2">
+          <button onClick={handleDelete} className="p-1 btn btn-sm text-primary font-semibold">
             Delete Audio Records
           </button>
         </div>
-      </div>
     </div>
     </div>
   );

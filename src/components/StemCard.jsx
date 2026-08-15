@@ -1,21 +1,21 @@
 import { Link } from 'react-router';
 
 const StemCard = ({ stem }) => {
+let inFile=stem.inputFile;
+  inFile=inFile.split("/").pop();
+  inFile=inFile.split('-')[1];
+
   return (
     <Link
       to={`/stems/${stem.id}`}
       style={{ textDecoration: 'none', color: 'inherit' }}
     >
-      <div className="card bg-base-100 w-96 shadow-sm">
-        <div className="card-body">
-          <h2 className="card-title">{stem.inputFile}</h2>
-          <p>{stem.inputFile}</p>
-          <div className=" ">
-            <span>
-              
-            </span>
-          </div>
-        </div>
+      <div className="divide-base-300 bg-base-200 border-base-300 rounded-box divide-y border">
+        
+          <h2 className="p-6 wrap-break-word font-serif text-primary group-hover:text-highlight block truncate font-semibold transition-colors">
+            {inFile}</h2>
+            
+        
       </div>
     </Link>
   );
