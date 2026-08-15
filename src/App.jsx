@@ -9,7 +9,8 @@ import SongsPage from './pages/SongsPage';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import SingleSongPage from './pages/SingleSongPage';
 import StemDetails from './pages/StemDetails';
-import StemAnalyzerPage from './pages/StemAnalyzerPage'
+import StemAnalyzerPage from './pages/StemAnalyzerPage';
+import CreateStem from './pages/CreateStemPage';
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
             <Route path="/songs/:id" element={<SingleSongPage />} />
             <Route path="/stems" element={<StemAnalyzerPage />} />
             <Route path="/stems/:id" element={<StemDetails/>} />
+            <Route path="/createstem" element={<CreateStem/>}/>
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

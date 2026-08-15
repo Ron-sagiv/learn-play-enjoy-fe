@@ -63,7 +63,7 @@ const StemDetails = () => {
         if (response.ok) {
           alert('Audio Records deleted successfully!');
           //window.location.href = '/';
-          setRedirect('/');
+          setRedirect('/stems');
         } else {
           const errorData = await response.json();
           console.error('Delete failed:', errorData);

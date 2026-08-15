@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import StemCard from '../components/StemCard';
+import { NavLink } from 'react-router';
 
 const StemAnalyzer = () => {
     const [audiofiles, setAudiofiles] = useState([]);
@@ -23,6 +24,9 @@ useEffect(() => {
     return (
   <div className="p-4">
     <h1 className="text-2xl font-bold mb-4">All process files</h1>
+    <div><NavLink to="/createstem" className="">
+                Create New Stem
+              </NavLink></div>
     <div className="grid gap-4 grid-cols-[repeat(auto-fill,30rem)]">
       {audiofiles.map((stem) => (
         <StemCard key={stem.id} stem={stem} />
