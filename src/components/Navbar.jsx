@@ -50,6 +50,9 @@ const Navbar = () => {
               <NavLink to="/home" className={linkClass}>
                 Home
               </NavLink>
+              <NavLink to="/stems" className={linkClass}>
+                StemAnalyzer
+              </NavLink>
               <button
                 className="btn btn-outline btn-sm border-secondary text-secondary hover:bg-secondary hover:text-secondary-content"
                 onClick={handleLogout}
@@ -101,6 +104,9 @@ const Navbar = () => {
               <>
                 <li>
                   <NavLink to="/home">Home</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/stems">StemAnalyzer</NavLink>
                 </li>
                 <li>
                   <button onClick={handleLogout}>Logout</button>

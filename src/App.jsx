@@ -8,6 +8,8 @@ import Welcome from './pages/Welcome';
 import SongsPage from './pages/SongsPage';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import SingleSongPage from './pages/SingleSongPage';
+import StemDetails from './pages/StemDetails';
+import StemAnalyzerPage from './pages/StemAnalyzerPage'
 
 const App = () => {
   return (
@@ -21,6 +23,8 @@ const App = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/songs" element={<SongsPage />} />
             <Route path="/songs/:id" element={<SingleSongPage />} />
+            <Route path="/stems" element={<StemAnalyzerPage />} />
+            <Route path="/stems/:id" element={<StemDetails/>} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

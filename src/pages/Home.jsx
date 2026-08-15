@@ -124,9 +124,7 @@ const Home = () => {
         )}
 
         {/* ---------- Player + chatbot ---------- */}
-        <div className="bg-base-200 border-base-300 rounded-box border p-4 sm:p-6">
-          <MusicPlayer />
-        </div>
+        
 
         {/* ---------- Saved songs ---------- */}
         <section>
