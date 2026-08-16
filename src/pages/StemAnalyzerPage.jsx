@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import StemCard from '../components/StemCard';
 import { NavLink } from 'react-router';
 import { useAuthenticationContext } from '../context/AuthenticationContext';
+import RecordView from '../components/Recorder';
 
 const StemAnalyzer = () => {
     const  {user}  = useAuthenticationContext();
@@ -39,6 +40,9 @@ useEffect(() => {
     <div className="text-red-500 mt-2">
         {error && <p>{error}</p>} 
     </div>
+
+    <div><RecordView/></div>
+
   </div>
   
 );
