@@ -3,15 +3,16 @@ import StemCard from '../components/StemCard';
 import { NavLink } from 'react-router';
 import { useAuthenticationContext } from '../context/AuthenticationContext';
 import RecordView from '../components/Recorder';
+import MusicPlayer from '../components/PlaySong';
 
-const StemAnalyzer = () => {
+const RecordingPage = () => {
     const  {user}  = useAuthenticationContext();
     const isAuthenticated = !!user;
     const [audiofiles, setAudiofiles] = useState([]);
     const [error, setError] = useState(null);
 useEffect(() => {
   if(isAuthenticated){
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audiofiles`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/recordings`)
     .then((res) => res.json())
     .then((data) => {
         //console.log(data);
@@ -27,23 +28,25 @@ useEffect(() => {
 
     
     return (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold mb-4">All process files</h1>
-    <div className='p-2'><NavLink to="/createstem" className="btn gap-1 px-2 text-xl font-bold">
-                Create New Stem
-              </NavLink></div>
-    <div className="grid gap-4 grid-cols-[repeat(auto-fill,30rem)]">
-      { audiofiles.map((stem) => (
-        <StemCard key={stem.id} stem={stem} />
-      ))}
-    </div>
-    <div className="text-red-500 mt-2">
-        {error && <p>{error}</p>} 
-    </div>
+    <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">All recorded files</h1>
+        
+        <div className="grid gap-4 grid-cols-[repeat(auto-fill,30rem)]">
+        { audiofiles.map((song) => (
+            <div id={song.id}>
+                <h1>OriginalName: </h1>{song.originalName} <MusicPlayer link={song.filePath}/>
+            </div>
+        ))}
+        </div>
+        <div className="text-red-500 mt-2">
+            {error && <p>{error}</p>} 
+        </div>
+
+        <div><RecordView/></div>
 
   </div>
   
 );
 };
 
-export default StemAnalyzer;
+export default RecordingPage;
