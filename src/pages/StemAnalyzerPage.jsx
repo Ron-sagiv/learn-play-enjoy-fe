@@ -11,10 +11,9 @@ const StemAnalyzer = () => {
   const [error, setError] = useState(null);
   useEffect(() => {
     if (isAuthenticated) {
-      fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audiofiles`)
+      fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audiofiles/getAllProcessed`)
         .then((res) => res.json())
         .then((data) => {
-          //console.log(data);
           const records = data;
           setAudiofiles(records);
           setError(null);
@@ -56,7 +55,7 @@ const StemAnalyzer = () => {
         )}
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-[repeat(auto-fill,minmax(22rem,1fr))]">
-          {audiofiles.map((stem) => (
+          {audiofiles.length>0 && audiofiles.map((stem) => (
             <StemCard key={stem.id} stem={stem} />
           ))}
         </div>
