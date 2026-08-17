@@ -13,6 +13,7 @@
     "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/karla": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
+    "mic-recorder-to-mp3-fixed": "^2.2.2",
     "react": "^19.2.8",
     "react-chatbotify": "^2.5.0",
     "react-dom": "^19.2.8",

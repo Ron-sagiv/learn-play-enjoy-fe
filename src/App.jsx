@@ -11,6 +11,7 @@ import SingleSongPage from './pages/SingleSongPage';
 import StemDetails from './pages/StemDetails';
 import StemAnalyzerPage from './pages/StemAnalyzerPage';
 import CreateStem from './pages/CreateStemPage';
+import RecordingPage from './pages/RecordingPage';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/stems" element={<StemAnalyzerPage />} />
             <Route path="/stems/:id" element={<StemDetails/>} />
             <Route path="/createstem" element={<CreateStem/>}/>
+            <Route path="/recording" element={<RecordingPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
