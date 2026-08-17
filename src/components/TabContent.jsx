@@ -11,9 +11,21 @@ const TabContent = ({ song }) => {
 
   return (
     <section className="mt-8">
-      <h2 className="font-serif text-accent mb-4 text-xl font-semibold sm:text-2xl">
-        How it goes
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-serif text-accent text-xl font-semibold sm:text-2xl">
+          How it goes
+        </h2>
+        {song.tabSite && (
+          <a
+            href={song.tabSite}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link link-primary text-sm font-medium"
+          >
+            Full Tab Link ↗
+          </a>
+        )}
+      </div>
 
       <div className="bg-base-200 border-base-300 rounded-box overflow-hidden border shadow-sm">
         {label && (
