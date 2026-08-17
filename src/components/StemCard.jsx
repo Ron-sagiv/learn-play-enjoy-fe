@@ -13,7 +13,7 @@ const StemCard = ({ stem }) => {
     >
       <div className="h-full rounded-box border border-base-300 bg-base-200 p-5 transition-colors hover:border-primary hover:bg-base-100">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="font-serif font-semibold break-words text-primary transition-colors group-hover:text-highlight">
+          <h2 className="font-serif font-semibold truncate text-primary transition-colors group-hover:text-highlight">
             {inFile}
           </h2>
           <span
