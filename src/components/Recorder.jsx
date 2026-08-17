@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MicRecorder from 'mic-recorder-to-mp3-fixed';
+import { Navigate } from 'react-router';
 
 // Initialize recorder with a 32000 bitrate (or 128k)
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -10,6 +11,7 @@ const RecordView=()=> {
   const [isBlocked, setIsBlocked] = useState(false);
   const [blob, setBlob] = useState('');
   const [error, setError] = useState('');
+  const [redirect, setRedirect] = useState('');
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -60,12 +62,17 @@ const RecordView=()=> {
         if (response.ok) {
           alert('Recording successfully stored!');
           setError(null);
+          setRedirect('/home');
           
         } else {
           setError('Error storing recordings , check console log for more details...');
         }
       }
   };
+
+  if (redirect) {
+    return <Navigate to={redirect} />;
+  }
 
   return (
     <div>
