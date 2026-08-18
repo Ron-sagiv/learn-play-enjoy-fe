@@ -133,7 +133,7 @@ const NotFound = () => {
         learn.
       </p>
 
-      <Link to="/" className="btn btn-primary mt-8 px-8">
+      <Link to="/home" className="btn btn-primary mt-8 px-8">
         Back to songs
       </Link>
     </main>
