@@ -65,14 +65,18 @@ const RecordingPage = () => {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="mb-6">
+      <header className="mb-8 sm:mb-10">
         <h1 className="font-serif text-base-content text-3xl sm:text-4xl">
-          All recorded files
+          Hear your progress!
         </h1>
-        <p className="text-neutral mt-1 text-sm">
-          Everything you've captured so far.
+        <p className="text-neutral mt-2 max-w-prose text-sm sm:text-base">
+          Record yourself every day and follow how you're improving.
         </p>
       </header>
+
+      <h2 className="font-serif text-base-content mb-4 text-xl sm:text-2xl">
+        All recorded files
+      </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]">
         {audiofiles.map((song) => (
@@ -83,9 +87,9 @@ const RecordingPage = () => {
             <p className="text-neutral text-xs tracking-wide uppercase">
               Original name
             </p>
-            <h2 className="text-base-content mt-1 font-semibold break-all">
+            <h3 className="text-base-content mt-1 font-semibold break-all">
               {song.originalName}
-            </h2>
+            </h3>
 
             <div className="mt-4">
               <MusicPlayer link={song.filePath} />
